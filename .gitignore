@@ -1,0 +1,23 @@
+﻿# OS files
+Thumbs.db
+Desktop.ini
+
+# Editor folders
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Dependency folders
+node_modules/
+miniprogram_npm/
+
+# Build output
+dist/
+build/
+coverage/
+
+# Local env files
+.env
+.env.*
