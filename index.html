@@ -1,0 +1,1079 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TO ？ LIST</title>
+  <style>
+    :root {
+      --line: #3f3554;
+      --text: #2f2744;
+      --muted: #5f5a76;
+      --panel: rgba(246, 255, 246, 0.92);
+      --accent: #58cfa8;
+      --bg-image: url('./像素背景2.png');
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Trebuchet MS", "Microsoft YaHei", monospace;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        var(--bg-image) center/cover no-repeat fixed,
+        linear-gradient(135deg, rgba(190, 250, 108, 0.45), rgba(136, 240, 111, 0.45));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(0deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+      background-size: 10px 10px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body > * { position: relative; z-index: 1; }
+
+    .music-fab {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      z-index: 80;
+      background: linear-gradient(180deg, #fff1d7, #ffd39a);
+      border: 2px solid #be7d46;
+      color: #6c3a1d;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 rgba(108, 58, 29, 0.25);
+    }
+
+    .app {
+      width: min(1000px, 100%);
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 3px solid var(--line);
+      border-radius: 10px;
+      box-shadow: 6px 6px 0 rgba(48, 37, 70, 0.35);
+      overflow: hidden;
+    }
+
+    .left { padding: 22px 20px; display: flex; flex-direction: column; gap: 16px; }
+    .right { padding: 20px; display: grid; grid-template-rows: minmax(260px, 1fr) 40px auto; gap: 14px; }
+    h1 {
+      font-size: 40px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-shadow: 2px 2px 0 #ffffff;
+    }
+
+    .brand-mark {
+      display: inline-block;
+      min-width: 1.2em;
+      text-align: center;
+      padding: 0 6px;
+      border-radius: 10px;
+      border: 3px solid #f39cc1;
+      color: #a04071;
+      background: #ffeaf3;
+      cursor: text;
+      outline: none;
+    }
+
+    .hint { color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+    .pack-actions, .input-row, .list-head { display: flex; gap: 8px; }
+    .list-head { align-items: center; justify-content: space-between; }
+
+    input {
+      flex: 1;
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    button {
+      border: 2px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text);
+      box-shadow: 3px 3px 0 rgba(63, 53, 84, 0.4);
+      background: #fff;
+    }
+
+    .btn-add { background: linear-gradient(180deg, #7df3cd, #49cfa5); }
+    .pack-actions .btn-add {
+      width: auto;
+      min-width: 0;
+      min-height: 44px;
+      font-size: 12px;
+      padding: 0 14px;
+      text-align: center;
+      border-radius: 10px;
+    }
+    .btn-draw { width: 100%; background: linear-gradient(180deg, #ffa4c4, #ff7ca5); font-size: 16px; padding: 12px; }
+    .btn-cancel { background: #f4ffea; border-color: #58cfa8; }
+    .btn-danger { background: rgba(255,255,255,0.9); color: #e11d48; border-color: rgba(244, 63, 94, 0.35); }
+
+    .collapse-btn { width: 28px; height: 28px; padding: 0; font-size: 16px; }
+    .counter { color: var(--muted); font-size: 13px; }
+
+    .list {
+      max-height: 240px;
+      overflow: auto;
+      border: 2px solid #58cfa8;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.88);
+    }
+
+    .pack-list {
+      height: 168px;
+      max-height: 168px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 8px;
+      border: 3px solid #58cfa8;
+      border-radius: 10px;
+      background: rgba(246, 255, 246, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .pack-list::-webkit-scrollbar { width: 8px; }
+    .pack-list::-webkit-scrollbar-track { background: rgba(88, 207, 168, 0.18); border-radius: 999px; }
+    .pack-list::-webkit-scrollbar-thumb { background: rgba(63, 53, 84, 0.38); border-radius: 999px; }
+    .pack-chip, .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    .item { border-bottom: 1px solid rgba(88, 207, 168, 0.35); }
+    .item:last-child { border-bottom: none; }
+    .pack-chip {
+      flex: 0 0 auto;
+      cursor: pointer;
+      border: 3px solid #43c59e;
+      border-radius: 10px;
+      margin-bottom: 0;
+      background: #f4ffea;
+      padding: 4px 10px;
+
+      min-height: 40px;
+    }
+    .pack-chip:last-child { margin-bottom: 0; }
+    .pack-chip.active { background: #b8e9d8; }
+    .item-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pack-name { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; font-weight: 800; line-height: 1.2; }
+    .pack-meta { margin-right: auto; color: var(--muted); font-size: 12px; font-weight: 700; margin-left: 8px; line-height: 1.2; }
+    .empty { padding: 14px 12px; color: var(--muted); font-size: 13px; }
+    .list.is-collapsed { display: none; }
+
+    .icon-delete, .icon-restore {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border-radius: 10px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .pack-chip .icon-delete {
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      border: 2px solid #b65b81;
+      background: #f5d2df;
+      color: #9f2f5b;
+      font-size: 16px;
+      font-weight: 800;
+      box-shadow: none;
+    }
+    .icon-delete { border-color: #b65b81; background: #ffe2ef; color: #9f2f5b; }
+    .icon-restore { border-color: #58cfa8; background: #e8fff5; color: #22695a; }
+    .item.is-inactive { opacity: 0.45; background: rgba(244, 255, 234, 0.72); }
+
+    .machine-wrap { position: relative; padding-right: 78px; }
+
+    .machine {
+      border: 3px solid var(--line);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #e8fff5, #cbf8e7);
+      padding: 16px;
+      position: relative;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,0.75), 4px 4px 0 rgba(63,53,84,0.25);
+      height: 100%;
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .spin-banner {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, #ffe3b4, #ffbe73);
+      color: #6c3a1d;
+      border: 2px solid #be7d46;
+      border-radius: 999px;
+      padding: 3px 14px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      opacity: 0.55;
+    }
+
+    .window {
+      border: 3px solid #3f3554;
+      border-radius: 8px;
+      background: #f4ffea;
+      overflow: hidden;
+      position: relative;
+      flex: 1;
+      min-height: 170px;
+      box-shadow: inset 0 0 0 2px rgba(88, 207, 168, 0.35);
+    }
+
+    .target-line {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      transform: translateY(-50%);
+      border-top: 3px solid rgba(255,124,165,0.96);
+      border-bottom: 3px solid rgba(255,124,165,0.96);
+      height: 28px;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .reel { position: absolute; left: 0; right: 0; top: 0; }
+
+    .cell {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      border-bottom: 1px dashed rgba(63,53,84,0.28);
+      background: rgba(255,255,255,0.72);
+      padding: 0 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .joystick { position: absolute; right: 6px; bottom: 6px; width: 64px; height: 128px; pointer-events: none; }
+    .lever { position: absolute; left: 29px; bottom: 28px; width: 6px; height: 68px; background: linear-gradient(180deg, #d1d5db, #94a3b8); border-radius: 999px; transform-origin: center bottom; transform: rotate(-22deg); }
+    .knob { position: absolute; top: -12px; left: 50%; width: 20px; height: 20px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(circle at 34% 30%, #fecdd3, #fb7185 65%); border: 2px solid rgba(244, 63, 94, 0.6); }
+    .base { position: absolute; left: 8px; bottom: 0; width: 48px; height: 32px; border-radius: 50%; border: 2px solid #3f3554; background: linear-gradient(180deg, #8ceacf, #52dcb2); }
+
+    .result { text-align: center; font-size: 18px; font-weight: 800; min-height: 30px; }
+    .history-entry { position: fixed; right: 18px; bottom: 18px; z-index: 40; width: auto; }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(48, 39, 68, 0.35);
+      backdrop-filter: blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal {
+      width: min(420px, 100%);
+      background: var(--panel);
+      border: 3px solid var(--line);
+      border-radius: 10px;
+      box-shadow: 6px 6px 0 rgba(48, 37, 70, 0.35);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-title { font-size: 18px; font-weight: 800; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+    .history-list {
+      max-height: 260px;
+      overflow-y: auto;
+      border: 2px solid #58cfa8;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.9);
+    }
+
+    .history-item { padding: 10px 12px; border-bottom: 1px solid rgba(88, 207, 168, 0.35); font-size: 13px; }
+    .history-item:last-child { border-bottom: none; }
+    .history-main { font-weight: 700; line-height: 1.4; word-break: break-word; }
+    .history-time { color: var(--muted); font-size: 12px; }
+
+    @media (max-width: 840px) {
+      .app { grid-template-columns: 1fr; }
+      .machine-wrap { padding-right: 72px; }
+    }
+  </style>
+</head>
+<body>
+  <audio id="bgm" src="./Pixel_Party_Anthem.mp3" preload="auto" loop></audio>
+  <button class="music-fab" id="musicToggleBtn" type="button" title="播放音乐" aria-label="播放音乐">♫</button>
+
+  <main class="app">
+    <section class="card left">
+      <h1>TO <span id="brandMark" class="brand-mark" contenteditable="true" spellcheck="false">？</span> LIST</h1>
+      <p class="hint">该做什么？老虎机会告诉你！🎰</p>
+
+      <div class="pack-actions">
+        <button class="btn-add" id="selectPackBtn" type="button">选择list</button>
+      </div>
+      <div id="packList" class="list pack-list"></div>
+
+      <div class="pack-actions">
+        <button class="btn-add" id="newPackBtn" type="button">新建list</button>
+      </div>
+
+      <div class="input-row" id="entryInputRow" style="display:none;">
+        <input id="entryInput" type="text" placeholder="输入to do，例如：南昌拌粉">
+        <button class="btn-add" id="addEntryBtn" type="button">添加to do</button>
+      </div>
+
+      <div class="list-head">
+        <p class="counter" id="counter">当前list：未选择</p>
+        <button id="toggleListBtn" class="collapse-btn" type="button" title="收起to do" aria-label="展开或收起to do列表">▾</button>
+      </div>
+      <div id="list" class="list"></div>
+    </section>
+
+    <section class="card right">
+      <div class="machine-wrap">
+        <div class="machine" id="machine">
+          <div class="spin-banner">SPIN TIME</div>
+          <div class="window" id="slotWindow">
+            <div class="target-line"></div>
+            <div id="reel" class="reel"></div>
+          </div>
+        </div>
+        <div class="joystick" aria-hidden="true">
+          <div class="lever"><div class="knob"></div></div>
+          <div class="base"></div>
+        </div>
+      </div>
+      <div id="result" class="result"></div>
+      <button class="btn-draw" id="drawBtn" type="button">开始抽取</button>
+    </section>
+  </main>
+
+  <div id="newPackModalMask" class="modal-mask" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="newPackTitle">
+      <div id="newPackTitle" class="modal-title">新建list</div>
+      <input id="newPackNameInput" type="text" placeholder="请输入list名称">
+      <div class="modal-actions">
+        <button id="cancelNewPackBtn" class="btn-cancel" type="button">取消</button>
+        <button id="confirmNewPackBtn" class="btn-add" type="button">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <button id="historyBtn" class="history-entry btn-add" type="button">历史记录</button>
+
+  <div id="historyModalMask" class="modal-mask" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+      <div id="historyTitle" class="modal-title">抽取历史</div>
+      <div id="historyList" class="history-list"></div>
+      <div class="modal-actions">
+        <button id="clearHistoryBtn" class="btn-danger" type="button">清空历史</button>
+        <button id="closeHistoryBtn" class="btn-cancel" type="button">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="musicNoticeModalMask" class="modal-mask" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="musicNoticeTitle">
+      <div id="musicNoticeTitle" class="modal-title">音乐提示</div>
+      <p class="hint">浏览器拦截了自动播放，请再点一次“播放音乐”。</p>
+      <div class="modal-actions">
+        <button id="closeMusicNoticeBtn" class="btn-add" type="button">我知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="limitNoticeModalMask" class="modal-mask" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="limitNoticeTitle">
+      <div id="limitNoticeTitle" class="modal-title">容量提示</div>
+      <p id="limitNoticeText" class="hint"></p>
+      <div class="modal-actions">
+        <button id="closeLimitNoticeBtn" class="btn-add" type="button">我知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const selectPackBtn = document.getElementById("selectPackBtn");
+    const newPackBtn = document.getElementById("newPackBtn");
+    const addEntryBtn = document.getElementById("addEntryBtn");
+    const drawBtn = document.getElementById("drawBtn");
+
+    const newPackModalMask = document.getElementById("newPackModalMask");
+    const newPackNameInput = document.getElementById("newPackNameInput");
+    const cancelNewPackBtn = document.getElementById("cancelNewPackBtn");
+    const confirmNewPackBtn = document.getElementById("confirmNewPackBtn");
+
+    const historyBtn = document.getElementById("historyBtn");
+    const historyModalMask = document.getElementById("historyModalMask");
+    const closeHistoryBtn = document.getElementById("closeHistoryBtn");
+    const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+    const historyListEl = document.getElementById("historyList");
+
+    const musicNoticeModalMask = document.getElementById("musicNoticeModalMask");
+    const closeMusicNoticeBtn = document.getElementById("closeMusicNoticeBtn");
+    const limitNoticeModalMask = document.getElementById("limitNoticeModalMask");
+    const limitNoticeText = document.getElementById("limitNoticeText");
+    const closeLimitNoticeBtn = document.getElementById("closeLimitNoticeBtn");
+
+    const entryInputRow = document.getElementById("entryInputRow");
+    const entryInput = document.getElementById("entryInput");
+    const packListEl = document.getElementById("packList");
+    const listEl = document.getElementById("list");
+    const resultEl = document.getElementById("result");
+    const counterEl = document.getElementById("counter");
+    const toggleListBtn = document.getElementById("toggleListBtn");
+    const reelEl = document.getElementById("reel");
+    const slotWindowEl = document.getElementById("slotWindow");
+    const brandMarkEl = document.getElementById("brandMark");
+
+    const bgmEl = document.getElementById("bgm");
+    const musicToggleBtn = document.getElementById("musicToggleBtn");
+
+    let packs = [];
+    let activePackId = null;
+    let spinning = false;
+    let spinRaf = null;
+    let historyRecords = [];
+    let isTodoCollapsed = localStorage.getItem("slot-todo-collapsed") === "1";
+
+    const cellHeight = 40;
+    const maxItemsPerPack = 20;
+
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+    }
+
+    function save() {
+      localStorage.setItem("slot-packs", JSON.stringify(packs));
+      localStorage.setItem("slot-active-pack-id", activePackId || "");
+    }
+
+    function load() {
+      try {
+        const raw = localStorage.getItem("slot-packs");
+        packs = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(packs)) packs = [];
+
+        packs = packs.map((pack, pIdx) => ({
+          id: typeof pack.id === "string" && pack.id ? pack.id : `pack-${Date.now()}-${pIdx}`,
+          name: typeof pack.name === "string" && pack.name.trim() ? pack.name.trim() : `list-${pIdx + 1}`,
+          items: Array.isArray(pack.items)
+            ? pack.items
+              .map((item, i) => {
+                if (!item || typeof item.text !== "string") return null;
+                const text = item.text.trim();
+                if (!text) return null;
+                return {
+                  id: typeof item.id === "string" && item.id ? item.id : `todo-${Date.now()}-${pIdx}-${i}`,
+                  text,
+                  enabled: item.enabled !== false
+                };
+              })
+              .filter(Boolean)
+              .slice(0, maxItemsPerPack)
+            : []
+        }));
+
+        const savedActivePackId = localStorage.getItem("slot-active-pack-id");
+        activePackId = packs.some((x) => x.id === savedActivePackId) ? savedActivePackId : null;
+      } catch (e) {
+        packs = [];
+        activePackId = null;
+      }
+    }
+
+    function saveHistory() {
+      localStorage.setItem("slot-history", JSON.stringify(historyRecords));
+    }
+
+    function loadHistory() {
+      try {
+        const raw = localStorage.getItem("slot-history");
+        const parsed = raw ? JSON.parse(raw) : [];
+        historyRecords = Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        historyRecords = [];
+      }
+    }
+
+    function loadBrandMark() {
+      const v = localStorage.getItem("slot-brand-mark");
+      if (v && v.trim()) brandMarkEl.textContent = v.trim();
+    }
+
+    function saveBrandMark() {
+      const v = brandMarkEl.textContent.trim() || "？";
+      brandMarkEl.textContent = v;
+      localStorage.setItem("slot-brand-mark", v);
+    }
+
+    function getActivePack() {
+      return packs.find((p) => p.id === activePackId) || null;
+    }
+
+    function setActivePack(id) {
+      activePackId = id;
+      const active = getActivePack();
+      if (active && active.name) {
+        brandMarkEl.textContent = active.name;
+        localStorage.setItem("slot-brand-mark", active.name);
+      }
+      save();
+      renderAll();
+    }
+
+    function syncTodoCollapseUI() {
+      listEl.classList.toggle("is-collapsed", isTodoCollapsed);
+      toggleListBtn.textContent = isTodoCollapsed ? "▸" : "▾";
+      toggleListBtn.title = isTodoCollapsed ? "展开to do" : "收起to do";
+    }
+
+    function toggleTodoCollapse() {
+      isTodoCollapsed = !isTodoCollapsed;
+      localStorage.setItem("slot-todo-collapsed", isTodoCollapsed ? "1" : "0");
+      syncTodoCollapseUI();
+    }
+
+    function openModal(mask) {
+      mask.style.display = "flex";
+      mask.setAttribute("aria-hidden", "false");
+    }
+
+    function closeModal(mask) {
+      mask.style.display = "none";
+      mask.setAttribute("aria-hidden", "true");
+    }
+
+    function openMusicNoticeModal() {
+      openModal(musicNoticeModalMask);
+    }
+
+    function closeMusicNoticeModal() {
+      closeModal(musicNoticeModalMask);
+    }
+
+    function openLimitNoticeModal(message) {
+      if (limitNoticeText) {
+        limitNoticeText.textContent = message || `当前list已达 ${maxItemsPerPack} 条上限`;
+      }
+      openModal(limitNoticeModalMask);
+    }
+
+    function closeLimitNoticeModal() {
+      closeModal(limitNoticeModalMask);
+    }
+
+    function syncMusicButton() {
+      const isPaused = bgmEl.paused;
+      musicToggleBtn.textContent = isPaused ? "♫" : "❚❚";
+      musicToggleBtn.title = isPaused ? "播放音乐" : "暂停音乐";
+      musicToggleBtn.setAttribute("aria-label", isPaused ? "播放音乐" : "暂停音乐");
+    }
+
+    async function toggleMusic() {
+      if (bgmEl.paused) {
+        try {
+          await bgmEl.play();
+        } catch (e) {
+          openMusicNoticeModal();
+        }
+      } else {
+        bgmEl.pause();
+      }
+      syncMusicButton();
+    }
+
+    function renderPackList() {
+      packListEl.innerHTML = "";
+      if (!packs.length) {
+        packListEl.innerHTML = '<div class="empty">暂无list，点击“新建list”创建。</div>';
+        return;
+      }
+
+      packs.forEach((pack) => {
+        const row = document.createElement("div");
+        row.className = `pack-chip${pack.id === activePackId ? " active" : ""}`;
+        row.onclick = () => {
+          if (spinning) return;
+          setActivePack(pack.id);
+        };
+
+        const name = document.createElement("span");
+        name.className = "pack-name";
+        name.textContent = pack.name;
+
+        const meta = document.createElement("span");
+        meta.className = "pack-meta";
+        meta.textContent = `(${pack.items.length}/${maxItemsPerPack})`;
+
+        const del = document.createElement("button");
+        del.className = "icon-delete";
+        del.type = "button";
+        del.textContent = "×";
+        del.onclick = (e) => {
+          e.stopPropagation();
+          if (spinning) return;
+          if (!window.confirm(`确认删除list“${pack.name}”？`)) return;
+          packs = packs.filter((x) => x.id !== pack.id);
+          if (activePackId === pack.id) activePackId = null;
+          save();
+          renderAll();
+        };
+
+        row.appendChild(name);
+        row.appendChild(meta);
+        row.appendChild(del);
+        packListEl.appendChild(row);
+      });
+    }
+
+    function renderList() {
+      listEl.innerHTML = "";
+      const active = getActivePack();
+      if (!active) {
+        listEl.innerHTML = '<div class="empty">未选择list。请先点击上方按钮。</div>';
+        return;
+      }
+
+      active.items.forEach((item, index) => {
+        const row = document.createElement("div");
+        row.className = `item${item.enabled ? "" : " is-inactive"}`;
+
+        const text = document.createElement("span");
+        text.className = "item-text";
+        text.textContent = item.text;
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+
+        if (item.enabled) {
+          btn.className = "icon-delete";
+          btn.textContent = "×";
+          btn.onclick = () => {
+            if (spinning) return;
+            active.items.splice(index, 1);
+            save();
+            renderAll();
+          };
+        } else {
+          btn.className = "icon-restore";
+          btn.textContent = "↺";
+          btn.onclick = () => {
+            if (spinning) return;
+            item.enabled = true;
+            save();
+            renderAll();
+          };
+        }
+
+        row.appendChild(text);
+        row.appendChild(btn);
+        listEl.appendChild(row);
+      });
+
+      if (!active.items.length) listEl.innerHTML = '<div class="empty">当前list暂无to do。</div>';
+    }
+
+    function renderReel(seed = [], repeat = 8) {
+      const active = getActivePack();
+      const enabledTexts = active ? active.items.filter((x) => x.enabled).map((x) => x.text) : [];
+      const allTexts = active ? active.items.map((x) => x.text) : [];
+      const source = seed.length ? seed : (enabledTexts.length ? enabledTexts : allTexts);
+      if (!source.length) {
+        reelEl.innerHTML = "";
+        return;
+      }
+
+      // Keep enough rows to fully cover the visible window even when source is very short.
+      const minCyclesByHeight = Math.ceil((slotWindowEl.clientHeight + cellHeight * 6) / (source.length * cellHeight));
+      const safeRepeat = Math.max(repeat, minCyclesByHeight, 10);
+
+      const loop = [];
+      for (let i = 0; i < safeRepeat; i++) loop.push(...source);
+      reelEl.innerHTML = loop.map((t) => `<div class="cell">${escapeHtml(t)}</div>`).join("");
+      reelEl.style.transform = "translateY(0px)";
+    }
+
+    function renderAll(preserveReel = false, preserveResult = false) {
+      const active = getActivePack();
+      const items = active ? active.items : [];
+      const enabledItems = active ? active.items.filter((x) => x.enabled) : [];
+
+      entryInputRow.style.display = active ? "flex" : "none";
+      renderPackList();
+      renderList();
+      if (!preserveReel) renderReel();
+      syncTodoCollapseUI();
+
+      if (!active) {
+        counterEl.textContent = `当前list：未选择（共 ${packs.length} 个）`;
+        if (!preserveResult) resultEl.textContent = "";
+        drawBtn.disabled = true;
+        drawBtn.style.opacity = "0.7";
+      } else if (!items.length || enabledItems.length === 0) {
+        counterEl.textContent = `当前list：${active.name}（可抽 ${enabledItems.length} / 共 ${items.length}）`;
+        if (!preserveResult) resultEl.textContent = "当前list暂无可抽取to do，请新增或恢复";
+        drawBtn.disabled = true;
+        drawBtn.style.opacity = "0.7";
+      } else {
+        counterEl.textContent = `当前list：${active.name}（可抽 ${enabledItems.length} / 共 ${items.length}）`;
+        drawBtn.disabled = false;
+        drawBtn.style.opacity = "1";
+      }
+    }
+
+    function promptCreatePack() {
+      if (spinning) return;
+      newPackNameInput.value = "";
+      openModal(newPackModalMask);
+      setTimeout(() => newPackNameInput.focus(), 0);
+    }
+
+    function confirmCreatePack() {
+      const name = newPackNameInput.value.trim();
+      if (!name) return;
+      packs.push({
+        id: `pack-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
+        name,
+        items: []
+      });
+      closeModal(newPackModalMask);
+      setActivePack(packs[packs.length - 1].id);
+      entryInput.focus();
+    }
+
+    function promptSelectPack() {
+      if (spinning) return;
+      if (!packs.length) {
+        resultEl.textContent = "还没有list，请先新建";
+        return;
+      }
+      resultEl.textContent = "请点击当前list下方列表进行切换";
+    }
+
+    function addEntry() {
+      if (spinning) return;
+      const active = getActivePack();
+      if (!active) return;
+
+      const text = entryInput.value.trim();
+      if (!text) return;
+
+      if (active.items.length >= maxItemsPerPack) {
+        openLimitNoticeModal(`当前list已达 ${maxItemsPerPack} 条上限`);
+        return;
+      }
+
+      active.items.push({
+        id: `todo-${Date.now()}-${Math.random().toString(16).slice(2, 7)}`,
+        text,
+        enabled: true
+      });
+
+      entryInput.value = "";
+      save();
+      renderAll();
+      entryInput.focus();
+    }
+
+    function uniformRandomInt(maxExclusive) {
+      if (maxExclusive <= 0) return 0;
+      if (window.crypto && window.crypto.getRandomValues) {
+        const maxUint = 0x100000000;
+        const limit = maxUint - (maxUint % maxExclusive);
+        const arr = new Uint32Array(1);
+        let n;
+        do {
+          window.crypto.getRandomValues(arr);
+          n = arr[0];
+        } while (n >= limit);
+        return n % maxExclusive;
+      }
+      return Math.floor(Math.random() * maxExclusive);
+    }
+
+    function shuffleForReel(source) {
+      const arr = [...source];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = uniformRandomInt(i + 1);
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function addHistoryRecord(todo, listName) {
+      const now = new Date();
+      historyRecords.unshift({
+        listName,
+        todo,
+        date: now.toLocaleDateString("zh-CN"),
+        clock: now.toLocaleTimeString("zh-CN", { hour12: false })
+      });
+      if (historyRecords.length > 200) historyRecords = historyRecords.slice(0, 200);
+      saveHistory();
+    }
+
+    function renderHistory() {
+      historyListEl.innerHTML = "";
+      if (!historyRecords.length) {
+        historyListEl.innerHTML = '<div class="empty">暂无抽取历史。</div>';
+        return;
+      }
+
+      historyRecords.forEach((r) => {
+        const row = document.createElement("div");
+        row.className = "history-item";
+        row.innerHTML = `
+          <div class="history-main">list: ${escapeHtml(r.listName || "未知list")} | to do: ${escapeHtml(r.todo || "")}</div>
+          <div class="history-time">日期: ${escapeHtml(r.date || "")} 时间: ${escapeHtml(r.clock || "")}</div>
+        `;
+        historyListEl.appendChild(row);
+      });
+    }
+
+    function openHistoryModal() {
+      renderHistory();
+      openModal(historyModalMask);
+    }
+
+    function drawOne() {
+      const active = getActivePack();
+      if (spinning || !active) return;
+
+      const activeEntries = active.items.filter((x) => x.enabled);
+      if (!activeEntries.length) {
+        if (!preserveResult) resultEl.textContent = "当前list暂无可抽取to do，请新增或恢复";
+        return;
+      }
+
+      spinning = true;
+      drawBtn.disabled = true;
+      drawBtn.style.opacity = "0.7";
+      resultEl.textContent = "抽取中...";
+
+      const winner = activeEntries[uniformRandomInt(activeEntries.length)];
+      const reelSeedEntries = shuffleForReel(activeEntries);
+      const reelWinnerIndex = reelSeedEntries.findIndex((x) => x.id === winner.id);
+      const reelSeed = reelSeedEntries.map((x) => x.text);
+      const repeat = 22;
+      renderReel(reelSeed, repeat);
+
+      const firstCell = reelEl.querySelector(".cell");
+      const rowHeight = firstCell ? firstCell.getBoundingClientRect().height : cellHeight;
+
+      const centerOffset = Math.max(0, slotWindowEl.clientHeight / 2 - rowHeight / 2);
+      const rowsBelowNeeded = Math.ceil((slotWindowEl.clientHeight - centerOffset) / rowHeight) + 1;
+      const tailCycles = Math.max(4, Math.ceil((rowsBelowNeeded + reelWinnerIndex + 1) / reelSeed.length));
+      const targetCycle = Math.max(0, repeat - tailCycles);
+      const targetIndex = targetCycle * reelSeed.length + reelWinnerIndex;
+      const endOffset = targetIndex * rowHeight - centerOffset;
+      const maxEndOffset = Math.max(0, reelEl.scrollHeight - slotWindowEl.clientHeight);
+      const safeEndOffset = Math.min(endOffset, maxEndOffset);
+
+      const duration = 2500 + Math.random() * 600;
+      const start = performance.now();
+
+      function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+      }
+
+      function animate(now) {
+        const t = Math.min(1, (now - start) / duration);
+        const pos = safeEndOffset * easeOutCubic(t);
+        reelEl.style.transform = `translateY(-${pos}px)`;
+
+        if (t < 1) {
+          spinRaf = requestAnimationFrame(animate);
+          return;
+        }
+
+        reelEl.style.transform = `translateY(-${safeEndOffset}px)`;
+
+        spinning = false;
+        drawBtn.disabled = false;
+        drawBtn.style.opacity = "1";
+
+        const reelRect = reelEl.getBoundingClientRect();
+        const windowRect = slotWindowEl.getBoundingClientRect();
+        const centerY = windowRect.top + windowRect.height / 2;
+        const visibleIndex = Math.round((centerY - reelRect.top - rowHeight / 2) / rowHeight);
+        const normalizedIndex = ((visibleIndex % reelSeedEntries.length) + reelSeedEntries.length) % reelSeedEntries.length;
+        const visualWinner = reelSeedEntries[normalizedIndex] || winner;
+
+        const target = active.items.find((x) => x.id === visualWinner.id);
+        if (target) target.enabled = false;
+        save();
+
+        resultEl.textContent = `恭喜抽中：${visualWinner.text} 🎉`;
+        addHistoryRecord(visualWinner.text, active.name || "未知list");
+        renderAll(true, true);
+      }
+
+      spinRaf = requestAnimationFrame(animate);
+    }
+
+    brandMarkEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        brandMarkEl.blur();
+      }
+    });
+    brandMarkEl.addEventListener("blur", saveBrandMark);
+
+    newPackBtn.addEventListener("click", promptCreatePack);
+    selectPackBtn.addEventListener("click", promptSelectPack);
+    addEntryBtn.addEventListener("click", addEntry);
+    drawBtn.addEventListener("click", drawOne);
+    toggleListBtn.addEventListener("click", toggleTodoCollapse);
+
+    cancelNewPackBtn.addEventListener("click", () => closeModal(newPackModalMask));
+    confirmNewPackBtn.addEventListener("click", confirmCreatePack);
+    newPackNameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") confirmCreatePack();
+      if (e.key === "Escape") closeModal(newPackModalMask);
+    });
+    newPackModalMask.addEventListener("click", (e) => {
+      if (e.target === newPackModalMask) closeModal(newPackModalMask);
+    });
+
+    historyBtn.addEventListener("click", openHistoryModal);
+    closeHistoryBtn.addEventListener("click", () => closeModal(historyModalMask));
+    clearHistoryBtn.addEventListener("click", () => {
+      historyRecords = [];
+      localStorage.removeItem("slot-history");
+      renderHistory();
+    });
+    historyModalMask.addEventListener("click", (e) => {
+      if (e.target === historyModalMask) closeModal(historyModalMask);
+    });
+
+    closeMusicNoticeBtn.addEventListener("click", closeMusicNoticeModal);
+    musicNoticeModalMask.addEventListener("click", (e) => {
+      if (e.target === musicNoticeModalMask) closeMusicNoticeModal();
+    });
+
+    closeLimitNoticeBtn.addEventListener("click", closeLimitNoticeModal);
+    limitNoticeModalMask.addEventListener("click", (e) => {
+      if (e.target === limitNoticeModalMask) closeLimitNoticeModal();
+    });
+
+    entryInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") addEntry();
+    });
+
+    musicToggleBtn.addEventListener("click", toggleMusic);
+    bgmEl.addEventListener("play", syncMusicButton);
+    bgmEl.addEventListener("pause", syncMusicButton);
+
+    loadBrandMark();
+    load();
+    loadHistory();
+    renderAll();
+    syncMusicButton();
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
