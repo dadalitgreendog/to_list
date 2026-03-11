@@ -46,23 +46,24 @@
 
     .music-fab {
       position: fixed;
-      top: 16px;
-      left: 16px;
-      width: 44px;
-      height: 44px;
+      top: 6px;
+      left: 6px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 0;
       z-index: 80;
-      background: linear-gradient(180deg, #fff1d7, #ffd39a);
-      border: 2px solid #be7d46;
-      color: #6c3a1d;
-      font-size: 16px;
+      background: rgba(255, 241, 215, 0.7);
+      backdrop-filter: blur(2px);
+      border: 1px solid rgba(190, 125, 70, 0.7);
+      color: rgba(108, 58, 29, 0.9);
+      font-size: 12px;
       font-weight: 900;
       cursor: pointer;
-      box-shadow: 3px 3px 0 rgba(108, 58, 29, 0.25);
+      box-shadow: 1px 1px 0 rgba(108, 58, 29, 0.16);
     }
 
     .app {
@@ -91,7 +92,7 @@
       background: #fff7cb;
       border-color: #e4ad52;
       color: #8a5b0a;
-      font-size: 18px;
+      font-size: 14px;
       box-shadow: 3px 3px 0 rgba(228, 173, 82, 0.25);
     }
 
@@ -385,6 +386,21 @@
     .lever { position: absolute; left: 29px; bottom: 28px; width: 6px; height: 68px; background: linear-gradient(180deg, #d1d5db, #94a3b8); border-radius: 999px; transform-origin: center bottom; transform: rotate(-22deg); }
     .knob { position: absolute; top: -12px; left: 50%; width: 20px; height: 20px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(circle at 34% 30%, #fecdd3, #fb7185 65%); border: 2px solid rgba(244, 63, 94, 0.6); }
     .base { position: absolute; left: 8px; bottom: 0; width: 48px; height: 32px; border-radius: 50%; border: 2px solid #3f3554; background: linear-gradient(180deg, #8ceacf, #52dcb2); }
+
+    .joystick.is-pulling .lever { animation: leverPull 0.55s ease-out 1; }
+    .joystick.is-pulling .knob { animation: knobPulse 0.55s ease-out 1; }
+
+    @keyframes leverPull {
+      0% { transform: rotate(-22deg); }
+      30% { transform: rotate(28deg); }
+      100% { transform: rotate(-22deg); }
+    }
+
+    @keyframes knobPulse {
+      0% { filter: saturate(1) brightness(1); }
+      30% { filter: saturate(1.35) brightness(1.2); }
+      100% { filter: saturate(1) brightness(1); }
+    }
 
     .history-entry { position: fixed; right: 18px; bottom: 18px; z-index: 40; width: auto; }
 
@@ -744,6 +760,10 @@
     const toggleListBtn = document.getElementById("toggleListBtn");
     const reelEl = document.getElementById("reel");
     const slotWindowEl = document.getElementById("slotWindow");
+    const machineEl = document.getElementById("machine");
+    const joystickEl = document.querySelector(".joystick");
+    const leverEl = document.querySelector(".lever");
+    const knobEl = document.querySelector(".knob");
     const brandMarkEl = document.getElementById("brandMark");
 
     const bgmEl = document.getElementById("bgm");
@@ -1212,6 +1232,37 @@
       });
     }
 
+    function triggerJoystickPull() {
+      if (leverEl && leverEl.animate) {
+        leverEl.animate(
+          [
+            { transform: "rotate(-22deg)" },
+            { transform: "rotate(28deg)", offset: 0.3 },
+            { transform: "rotate(-22deg)" }
+          ],
+          { duration: 560, easing: "ease-out", iterations: 1 }
+        );
+      } else if (joystickEl) {
+        joystickEl.classList.remove("is-pulling");
+        void joystickEl.offsetWidth;
+        joystickEl.classList.add("is-pulling");
+        setTimeout(() => {
+          joystickEl.classList.remove("is-pulling");
+        }, 560);
+      }
+
+      if (knobEl && knobEl.animate) {
+        knobEl.animate(
+          [
+            { filter: "saturate(1) brightness(1)", transform: "translateX(-50%) scale(1)" },
+            { filter: "saturate(1.35) brightness(1.2)", transform: "translateX(-50%) scale(1.08)", offset: 0.3 },
+            { filter: "saturate(1) brightness(1)", transform: "translateX(-50%) scale(1)" }
+          ],
+          { duration: 560, easing: "ease-out", iterations: 1 }
+        );
+      }
+    }
+
     function openHistoryModal() {
       renderHistory();
       openModal(historyModalMask);
@@ -1227,6 +1278,8 @@
       }
 
       spinning = true;
+      machineEl.classList.add("is-spinning");
+      triggerJoystickPull();
       drawBtn.disabled = true;
       drawBtn.style.opacity = "0.7";
 
@@ -1269,6 +1322,7 @@
         reelEl.style.transform = `translateY(-${safeEndOffset}px)`;
 
         spinning = false;
+        machineEl.classList.remove("is-spinning");
         drawBtn.disabled = false;
         drawBtn.style.opacity = "1";
 
@@ -1368,6 +1422,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
