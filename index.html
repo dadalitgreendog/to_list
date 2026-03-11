@@ -72,6 +72,66 @@
       gap: 18px;
     }
 
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .help-trigger {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: #fff7cb;
+      border-color: #e4ad52;
+      color: #8a5b0a;
+      font-size: 18px;
+      box-shadow: 3px 3px 0 rgba(228, 173, 82, 0.25);
+    }
+
+    .help-trigger::after {
+      content: "使用说明";
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 10px);
+      transform: translateX(-50%) translateY(-4px);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 2px solid var(--line);
+      background: rgba(255, 247, 203, 0.98);
+      color: var(--text);
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: 4;
+    }
+
+    .help-trigger:hover::after,
+    .help-trigger:focus-visible::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .guide-modal {
+      width: min(620px, 100%);
+    }
+
+    .guide-text {
+      white-space: pre-line;
+      line-height: 1.7;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+
     .card {
       background: var(--panel);
       border: 3px solid var(--line);
@@ -81,11 +141,12 @@
     }
 
     .left { padding: 22px 20px; display: flex; flex-direction: column; gap: 16px; }
-    .right { padding: 20px; display: grid; grid-template-rows: minmax(260px, 1fr) 40px auto; gap: 14px; }
+    .right { padding: 20px; display: grid; grid-template-rows: minmax(260px, 1fr) auto; gap: 14px; }
     h1 {
       font-size: 40px;
       font-weight: 900;
       letter-spacing: 1px;
+      line-height: 1.05;
       text-shadow: 2px 2px 0 #ffffff;
     }
 
@@ -104,7 +165,8 @@
 
     .hint { color: var(--muted); font-size: 13px; line-height: 1.45; }
 
-    .pack-actions, .input-row, .list-head { display: flex; gap: 8px; }
+    .pack-toolbar, .pack-actions, .input-row, .list-head { display: flex; gap: 8px; }
+    .pack-toolbar { align-items: center; justify-content: flex-start; }
     .list-head { align-items: center; justify-content: space-between; }
 
     input {
@@ -156,8 +218,8 @@
     }
 
     .pack-list {
-      height: 168px;
-      max-height: 168px;
+      height: 136px;
+      max-height: 136px;
       overflow-y: auto;
       overflow-x: hidden;
       padding: 8px;
@@ -282,6 +344,28 @@
     }
 
     .reel { position: absolute; left: 0; right: 0; top: 0; }
+    .reel-empty-state {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--muted);
+      z-index: 4;
+    }
+
+    .window.is-empty .target-line {
+      display: none;
+    }
+
+    .window.is-empty .reel-empty-state {
+      display: flex;
+    }
+
 
     .cell {
       height: 28px;
@@ -302,7 +386,6 @@
     .knob { position: absolute; top: -12px; left: 50%; width: 20px; height: 20px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(circle at 34% 30%, #fecdd3, #fb7185 65%); border: 2px solid rgba(244, 63, 94, 0.6); }
     .base { position: absolute; left: 8px; bottom: 0; width: 48px; height: 32px; border-radius: 50%; border: 2px solid #3f3554; background: linear-gradient(180deg, #8ceacf, #52dcb2); }
 
-    .result { text-align: center; font-size: 18px; font-weight: 800; min-height: 30px; }
     .history-entry { position: fixed; right: 18px; bottom: 18px; z-index: 40; width: auto; }
 
     .modal-mask {
@@ -330,6 +413,7 @@
     }
 
     .modal-title { font-size: 18px; font-weight: 800; }
+    .winner-text { text-align: center; font-size: 28px; line-height: 1.35; font-weight: 900; color: var(--text); }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
 
     .history-list {
@@ -346,8 +430,150 @@
     .history-time { color: var(--muted); font-size: 12px; }
 
     @media (max-width: 840px) {
-      .app { grid-template-columns: 1fr; }
-      .machine-wrap { padding-right: 72px; }
+      body {
+        padding: 10px;
+      }
+      .app {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .card {
+        border-width: 2px;
+        box-shadow: 4px 4px 0 var(--shadow);
+      }
+      .left {
+        padding: 14px 12px;
+        gap: 10px;
+      }
+      .right {
+        padding: 14px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        min-height: 0;
+      }
+      h1 {
+        white-space: nowrap;
+        font-size: clamp(28px, 9vw, 40px);
+        letter-spacing: 0.5px;
+      }
+      .brand-mark {
+        padding: 0 4px;
+        border-width: 2px;
+      }
+      .hint,
+      .counter {
+        font-size: 12px;
+      }
+      .pack-actions,
+      .input-row,
+      .list-head,
+      .modal-actions {
+        gap: 6px;
+      }
+      input,
+      button {
+        font-size: 13px;
+        padding: 8px 10px;
+      }
+      .btn-draw,
+      .btn-clear {
+        padding: 10px;
+        margin-top: 0;
+      }
+      .pack-list {
+        height: 92px;
+        max-height: 92px;
+        padding: 4px;
+        overflow-y: auto;
+      }
+      .pack-chip {
+        min-height: 30px;
+        padding: 3px 4px 3px 8px;
+      }
+      .pack-chip + .pack-chip {
+        margin-top: 4px;
+      }
+      .pack-chip-meta,
+      .pack-chip-input {
+        font-size: 12px;
+      }
+      .list {
+        max-height: 180px;
+      }
+      .item {
+        padding: 8px 10px;
+        font-size: 13px;
+      }
+      .reel-empty-state {
+        padding: 12px;
+        font-size: 16px;
+      }
+      .active-pack-bar {
+        padding: 6px 8px;
+        font-size: 12px;
+      }
+      .machine-wrap {
+        padding-right: 52px;
+        margin-bottom: 0;
+      }
+      .machine {
+        padding: 12px;
+        min-height: 220px;
+      }
+      .spin-banner {
+        top: 8px;
+        padding: 2px 10px;
+        font-size: 11px;
+      }
+      .window {
+        min-height: 132px;
+      }
+      .cell,
+      .target-line {
+        height: 24px;
+      }
+      .cell {
+        padding: 0 8px;
+        font-size: 13px;
+      }
+      .joystick {
+        width: 48px;
+        height: 96px;
+        right: 2px;
+        bottom: 2px;
+      }
+      .lever {
+        left: 21px;
+        bottom: 20px;
+        height: 50px;
+      }
+      .knob {
+        width: 16px;
+        height: 16px;
+        top: -10px;
+      }
+      .base {
+        left: 4px;
+        width: 38px;
+        height: 24px;
+      }
+      }
+      .history-entry {
+        right: 10px;
+        bottom: 10px;
+        padding: 8px 10px;
+        font-size: 12px;
+        border-width: 2px;
+        box-shadow: 3px 3px 0 rgba(63, 53, 84, 0.3);
+      }
+      .modal {
+        padding: 12px;
+        gap: 10px;
+      }
+      .winner-text {
+        font-size: 22px;
+      }
     }
   </style>
 </head>
@@ -357,17 +583,16 @@
 
   <main class="app">
     <section class="card left">
-      <h1>TO <span id="brandMark" class="brand-mark" contenteditable="true" spellcheck="false">？</span> LIST</h1>
+      <div class="brand-row">
+        <h1>TO <span id="brandMark" class="brand-mark" contenteditable="true" spellcheck="false">？</span> LIST</h1>
+        <button id="guideBtn" class="help-trigger" type="button" aria-label="使用说明">?</button>
+      </div>
       <p class="hint">该做什么？老虎机会告诉你！🎰</p>
-
-      <div class="pack-actions">
-        <button class="btn-add" id="selectPackBtn" type="button">选择list</button>
+      <div class="pack-toolbar">
+        <button class="btn-add" id="newPackBtn" type="button">新建list</button>
       </div>
       <div id="packList" class="list pack-list"></div>
 
-      <div class="pack-actions">
-        <button class="btn-add" id="newPackBtn" type="button">新建list</button>
-      </div>
 
       <div class="input-row" id="entryInputRow" style="display:none;">
         <input id="entryInput" type="text" placeholder="输入to do，例如：南昌拌粉">
@@ -388,6 +613,7 @@
           <div class="window" id="slotWindow">
             <div class="target-line"></div>
             <div id="reel" class="reel"></div>
+            <div id="reelEmptyState" class="reel-empty-state" aria-live="polite"></div>
           </div>
         </div>
         <div class="joystick" aria-hidden="true">
@@ -395,7 +621,6 @@
           <div class="base"></div>
         </div>
       </div>
-      <div id="result" class="result"></div>
       <button class="btn-draw" id="drawBtn" type="button">开始抽取</button>
     </section>
   </main>
@@ -423,6 +648,20 @@
       </div>
     </div>
   </div>
+  <div id="guideModalMask" class="modal-mask" aria-hidden="true">
+    <div class="modal guide-modal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+      <div id="guideTitle" class="modal-title">使用说明</div>
+      <p class="guide-text">1.点击新建list，创建属于你的老虎机列表🫵
+2.给list添加to do，犹豫不决的事情加加加到厌倦🫸
+3.一切准备就绪，开始抽取幸运答案吧😻
+4.抽取过的to do默认不被再次抽取，如要恢复，展开list点击🔙
+5.建好的list和to do们存在浏览器本地，所以无法跨浏览器或设备使用😢</p>
+      <div class="modal-actions">
+        <button id="closeGuideBtn" class="btn-add" type="button">我知道了</button>
+      </div>
+    </div>
+  </div>
+
 
   <div id="musicNoticeModalMask" class="modal-mask" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="musicNoticeTitle">
@@ -443,9 +682,28 @@
       </div>
     </div>
   </div>
+  <div id="confirmModalMask" class="modal-mask" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+      <div id="confirmModalTitle" class="modal-title">确认操作</div>
+      <p id="confirmModalText" class="hint"></p>
+      <div class="modal-actions">
+        <button id="cancelConfirmBtn" class="btn-cancel" type="button">取消</button>
+        <button id="acceptConfirmBtn" class="btn-danger" type="button">确定</button>
+      </div>
+    </div>
+  </div>
+  <div id="winnerModalMask" class="modal-mask" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="winnerModalTitle">
+      <div id="winnerModalTitle" class="modal-title">抽取结果</div>
+      <p id="winnerModalText" class="winner-text"></p>
+      <div class="modal-actions">
+        <button id="closeWinnerBtn" class="btn-add" type="button">好耶</button>
+      </div>
+    </div>
+  </div>
+
 
   <script>
-    const selectPackBtn = document.getElementById("selectPackBtn");
     const newPackBtn = document.getElementById("newPackBtn");
     const addEntryBtn = document.getElementById("addEntryBtn");
     const drawBtn = document.getElementById("drawBtn");
@@ -461,17 +719,27 @@
     const clearHistoryBtn = document.getElementById("clearHistoryBtn");
     const historyListEl = document.getElementById("historyList");
 
+    const guideBtn = document.getElementById("guideBtn");
+    const guideModalMask = document.getElementById("guideModalMask");
+    const closeGuideBtn = document.getElementById("closeGuideBtn");
     const musicNoticeModalMask = document.getElementById("musicNoticeModalMask");
     const closeMusicNoticeBtn = document.getElementById("closeMusicNoticeBtn");
     const limitNoticeModalMask = document.getElementById("limitNoticeModalMask");
     const limitNoticeText = document.getElementById("limitNoticeText");
+    const reelEmptyStateEl = document.getElementById("reelEmptyState");
     const closeLimitNoticeBtn = document.getElementById("closeLimitNoticeBtn");
+    const confirmModalMask = document.getElementById("confirmModalMask");
+    const confirmModalText = document.getElementById("confirmModalText");
+    const cancelConfirmBtn = document.getElementById("cancelConfirmBtn");
+    const acceptConfirmBtn = document.getElementById("acceptConfirmBtn");
+    const winnerModalMask = document.getElementById("winnerModalMask");
+    const winnerModalText = document.getElementById("winnerModalText");
+    const closeWinnerBtn = document.getElementById("closeWinnerBtn");
 
     const entryInputRow = document.getElementById("entryInputRow");
     const entryInput = document.getElementById("entryInput");
     const packListEl = document.getElementById("packList");
     const listEl = document.getElementById("list");
-    const resultEl = document.getElementById("result");
     const counterEl = document.getElementById("counter");
     const toggleListBtn = document.getElementById("toggleListBtn");
     const reelEl = document.getElementById("reel");
@@ -487,9 +755,39 @@
     let spinRaf = null;
     let historyRecords = [];
     let isTodoCollapsed = localStorage.getItem("slot-todo-collapsed") === "1";
+    let pendingConfirmAction = null;
 
     const cellHeight = 40;
     const maxItemsPerPack = 20;
+    const defaultPacks = [
+      {
+        id: "default-pack-eat",
+        name: "EAT",
+        items: [
+          { id: "default-eat-1", text: "南昌拌粉", enabled: true },
+          { id: "default-eat-2", text: "煎饼果子", enabled: true },
+          { id: "default-eat-3", text: "鸡蛋肠粉", enabled: true },
+          { id: "default-eat-4", text: "小蛋糕", enabled: true },
+          { id: "default-eat-5", text: "馄饨", enabled: true },
+          { id: "default-eat-6", text: "盖浇饭", enabled: true },
+          { id: "default-eat-7", text: "烧烤", enabled: true },
+          { id: "default-eat-8", text: "轻食", enabled: true },
+          { id: "default-eat-9", text: "卤味", enabled: true },
+          { id: "default-eat-10", text: "鸡蛋灌饼", enabled: true }
+        ]
+      },
+      {
+        id: "default-pack-drink",
+        name: "DRINK",
+        items: [
+          { id: "default-drink-1", text: "奶茶", enabled: true },
+          { id: "default-drink-2", text: "美式咖啡", enabled: true },
+          { id: "default-drink-3", text: "拿铁", enabled: true },
+          { id: "default-drink-4", text: "电解质水", enabled: true },
+          { id: "default-drink-5", text: "苹果汁", enabled: true }
+        ]
+      }
+    ];
 
     function escapeHtml(text) {
       return text.replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
@@ -503,8 +801,9 @@
     function load() {
       try {
         const raw = localStorage.getItem("slot-packs");
-        packs = raw ? JSON.parse(raw) : [];
+        packs = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(defaultPacks));
         if (!Array.isArray(packs)) packs = [];
+        if (!packs.length) packs = JSON.parse(JSON.stringify(defaultPacks));
 
         packs = packs.map((pack, pIdx) => ({
           id: typeof pack.id === "string" && pack.id ? pack.id : `pack-${Date.now()}-${pIdx}`,
@@ -604,6 +903,14 @@
       closeModal(musicNoticeModalMask);
     }
 
+    function openGuideModal() {
+      openModal(guideModalMask);
+    }
+
+    function closeGuideModal() {
+      closeModal(guideModalMask);
+    }
+
     function openLimitNoticeModal(message) {
       if (limitNoticeText) {
         limitNoticeText.textContent = message || `当前list已达 ${maxItemsPerPack} 条上限`;
@@ -615,6 +922,32 @@
       closeModal(limitNoticeModalMask);
     }
 
+    function openConfirmModal(message, onConfirm) {
+      pendingConfirmAction = typeof onConfirm === "function" ? onConfirm : null;
+      confirmModalText.textContent = message || "确认继续此操作？";
+      openModal(confirmModalMask);
+    }
+
+    function closeConfirmModal() {
+      pendingConfirmAction = null;
+      closeModal(confirmModalMask);
+    }
+
+    function acceptConfirmModal() {
+      const action = pendingConfirmAction;
+      closeConfirmModal();
+      if (action) action();
+    }
+
+
+    function openWinnerModal(message) {
+      winnerModalText.textContent = message || "";
+      openModal(winnerModalMask);
+    }
+
+    function closeWinnerModal() {
+      closeModal(winnerModalMask);
+    }
     function syncMusicButton() {
       const isPaused = bgmEl.paused;
       musicToggleBtn.textContent = isPaused ? "♫" : "❚❚";
@@ -665,11 +998,12 @@
         del.onclick = (e) => {
           e.stopPropagation();
           if (spinning) return;
-          if (!window.confirm(`确认删除list“${pack.name}”？`)) return;
-          packs = packs.filter((x) => x.id !== pack.id);
-          if (activePackId === pack.id) activePackId = null;
-          save();
-          renderAll();
+          openConfirmModal(`确认删除list“${pack.name}”？`, () => {
+            packs = packs.filter((x) => x.id !== pack.id);
+            if (activePackId === pack.id) activePackId = null;
+            save();
+            renderAll();
+          });
         };
 
         row.appendChild(name);
@@ -683,7 +1017,7 @@
       listEl.innerHTML = "";
       const active = getActivePack();
       if (!active) {
-        listEl.innerHTML = '<div class="empty">未选择list。请先点击上方按钮。</div>';
+        listEl.innerHTML = '<div class="empty">未选择list。请先点击上方列表。</div>';
         return;
       }
 
@@ -731,8 +1065,14 @@
       const enabledTexts = active ? active.items.filter((x) => x.enabled).map((x) => x.text) : [];
       const allTexts = active ? active.items.map((x) => x.text) : [];
       const source = seed.length ? seed : (enabledTexts.length ? enabledTexts : allTexts);
+      const shouldShowEmptyHint = Boolean(active && allTexts.length === 0);
+
+      slotWindowEl.classList.toggle("is-empty", shouldShowEmptyHint);
+      reelEmptyStateEl.textContent = shouldShowEmptyHint ? "先添加to do喔~" : "";
+
       if (!source.length) {
         reelEl.innerHTML = "";
+        reelEl.style.transform = "translateY(0px)";
         return;
       }
 
@@ -759,12 +1099,10 @@
 
       if (!active) {
         counterEl.textContent = `当前list：未选择（共 ${packs.length} 个）`;
-        if (!preserveResult) resultEl.textContent = "";
         drawBtn.disabled = true;
         drawBtn.style.opacity = "0.7";
       } else if (!items.length || enabledItems.length === 0) {
         counterEl.textContent = `当前list：${active.name}（可抽 ${enabledItems.length} / 共 ${items.length}）`;
-        if (!preserveResult) resultEl.textContent = "当前list暂无可抽取to do，请新增或恢复";
         drawBtn.disabled = true;
         drawBtn.style.opacity = "0.7";
       } else {
@@ -792,15 +1130,6 @@
       closeModal(newPackModalMask);
       setActivePack(packs[packs.length - 1].id);
       entryInput.focus();
-    }
-
-    function promptSelectPack() {
-      if (spinning) return;
-      if (!packs.length) {
-        resultEl.textContent = "还没有list，请先新建";
-        return;
-      }
-      resultEl.textContent = "请点击当前list下方列表进行切换";
     }
 
     function addEntry() {
@@ -894,14 +1223,12 @@
 
       const activeEntries = active.items.filter((x) => x.enabled);
       if (!activeEntries.length) {
-        if (!preserveResult) resultEl.textContent = "当前list暂无可抽取to do，请新增或恢复";
         return;
       }
 
       spinning = true;
       drawBtn.disabled = true;
       drawBtn.style.opacity = "0.7";
-      resultEl.textContent = "抽取中...";
 
       const winner = activeEntries[uniformRandomInt(activeEntries.length)];
       const reelSeedEntries = shuffleForReel(activeEntries);
@@ -956,9 +1283,9 @@
         if (target) target.enabled = false;
         save();
 
-        resultEl.textContent = `恭喜抽中：${visualWinner.text} 🎉`;
         addHistoryRecord(visualWinner.text, active.name || "未知list");
         renderAll(true, true);
+        openWinnerModal(`恭喜抽中：${visualWinner.text} 🎉`);
       }
 
       spinRaf = requestAnimationFrame(animate);
@@ -973,7 +1300,6 @@
     brandMarkEl.addEventListener("blur", saveBrandMark);
 
     newPackBtn.addEventListener("click", promptCreatePack);
-    selectPackBtn.addEventListener("click", promptSelectPack);
     addEntryBtn.addEventListener("click", addEntry);
     drawBtn.addEventListener("click", drawOne);
     toggleListBtn.addEventListener("click", toggleTodoCollapse);
@@ -1004,9 +1330,26 @@
       if (e.target === musicNoticeModalMask) closeMusicNoticeModal();
     });
 
+    guideBtn.addEventListener("click", openGuideModal);
+    closeGuideBtn.addEventListener("click", closeGuideModal);
+    guideModalMask.addEventListener("click", (e) => {
+      if (e.target === guideModalMask) closeGuideModal();
+    });
+
     closeLimitNoticeBtn.addEventListener("click", closeLimitNoticeModal);
     limitNoticeModalMask.addEventListener("click", (e) => {
       if (e.target === limitNoticeModalMask) closeLimitNoticeModal();
+    });
+
+    cancelConfirmBtn.addEventListener("click", closeConfirmModal);
+    acceptConfirmBtn.addEventListener("click", acceptConfirmModal);
+    confirmModalMask.addEventListener("click", (e) => {
+      if (e.target === confirmModalMask) closeConfirmModal();
+    });
+
+    closeWinnerBtn.addEventListener("click", closeWinnerModal);
+    winnerModalMask.addEventListener("click", (e) => {
+      if (e.target === winnerModalMask) closeWinnerModal();
     });
 
     entryInput.addEventListener("keydown", (e) => {
@@ -1025,6 +1368,23 @@
   </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
